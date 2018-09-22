@@ -4,7 +4,7 @@ package lesson1.task1
 import kotlin.math.sqrt
 
 /**
- * Пример TODO
+ * Пример
  *
  * Вычисление квадрата целого числа
  */
