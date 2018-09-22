@@ -1,10 +1,10 @@
 @file:Suppress("UNUSED_PARAMETER")
 package lesson1.task1
 
-import kotlin.math.*
+import kotlin.math.sqrt
 
 /**
- * Пример
+ * Пример TODO
  *
  * Вычисление квадрата целого числа
  */
