@@ -71,9 +71,7 @@ fun circleInside(x1: Double, y1: Double, r1: Double,
 
     val distance = sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0))
 
-    if (distance <= Math.abs(r1 - r2)) return true
-
-    return false
+    return distance <= r2 - r1
 }
 
 /**

@@ -66,7 +66,17 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    var orig = n
+    val digits = mutableSetOf<Int>()
+
+    while (orig != 0) {
+        digits.add(orig % 10)
+        orig /= 10
+    }
+
+    return digits.size
+}
 
 /**
  * Простая
@@ -114,7 +124,17 @@ fun isCoPrime(m: Int, n: Int): Boolean = TODO()
  * то есть, существует ли такое целое k, что m <= k*k <= n.
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
-fun squareBetweenExists(m: Int, n: Int): Boolean = TODO()
+fun squareBetweenExists(m: Int, n: Int): Boolean {
+    var min = Math.ceil(Math.sqrt(m.toDouble()))
+    val max = Math.floor(Math.sqrt(n.toDouble()))
+
+    while (min <= max) {
+        if (Math.pow(min, 2.0) <= n) return true
+        min++
+    }
+
+    return false
+}
 
 /**
  * Средняя
@@ -159,7 +179,19 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun revert(n: Int): Int = TODO()
+fun revert(n: Int): Int {
+    var orig = n
+    var output = 0
+    var currentDigit: Int
+
+    while (orig != 0) {
+        currentDigit = orig % 10
+        output = output * 10 + currentDigit
+        orig /= 10
+    }
+
+    return output
+}
 
 /**
  * Средняя
@@ -170,7 +202,17 @@ fun revert(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = TODO()
+fun isPalindrome(n: Int): Boolean {
+    var orig = n
+    val digits = mutableListOf<Int>()
+
+    while (orig != 0) {
+        digits.add(orig % 10)
+        orig /= 10
+    }
+
+    return digits == digits.reversed()
+}
 
 /**
  * Средняя
@@ -180,7 +222,17 @@ fun isPalindrome(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun hasDifferentDigits(n: Int): Boolean = TODO()
+fun hasDifferentDigits(n: Int): Boolean {
+    var orig = n
+    val digits = mutableSetOf<Int>()
+
+    while (orig != 0) {
+        digits.add(orig % 10)
+        orig /= 10
+    }
+
+    return digits.size > 1
+}
 
 /**
  * Сложная
