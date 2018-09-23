@@ -1,4 +1,5 @@
 @file:Suppress("UNUSED_PARAMETER")
+
 package lesson3.task1
 
 import kotlin.math.sqrt
@@ -38,7 +39,7 @@ fun isPrime(n: Int): Boolean {
  */
 fun isPerfect(n: Int): Boolean {
     var sum = 1
-    for (m in 2..n/2) {
+    for (m in 2..n / 2) {
         if (n % m > 0) continue
         sum += m
         if (sum > n) break
@@ -67,8 +68,10 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
+    if (n == 0) return 1
+
     var orig = n
-    val digits = mutableSetOf<Int>()
+    val digits = mutableListOf<Int>()
 
     while (orig != 0) {
         digits.add(orig % 10)
@@ -84,7 +87,21 @@ fun digitNumber(n: Int): Int {
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int {
+    if (n == 0) return 0
+
+    var a = 0
+    var b = 1
+    var c: Int
+
+    for (i in 2..n) {
+        c = a + b
+        a = b
+        b = c
+    }
+
+    return b
+}
 
 /**
  * Простая
@@ -243,7 +260,28 @@ fun hasDifferentDigits(n: Int): Boolean {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int {
+    val results = mutableListOf<Int>()
+    for (i in 1..n) {
+        var powOutput = i * i
+
+        if (powOutput >= 10) {
+            var orig = powOutput
+            val tmpDigits = mutableListOf<Int>() // because digits are being extracted from the right
+            while (orig != 0) {
+                tmpDigits.add(orig % 10)
+                orig /= 10
+            }
+            results.addAll(tmpDigits.reversed()) // let's reverse it
+        } else {
+            results.add(powOutput)
+        }
+
+        if (results.size >= n) return results.get(n - 1)
+    }
+
+    return -1 // nr lower than zero
+}
 
 /**
  * Сложная
@@ -254,4 +292,25 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int {
+    val results = mutableListOf<Int>()
+    for (i in 1..n) {
+        var fibOutput = fib(i)
+
+        if (fibOutput >= 10) {
+            var orig = fibOutput
+            val tmpDigits = mutableListOf<Int>() // because digits are being extracted from the right
+            while (orig != 0) {
+                tmpDigits.add(orig % 10)
+                orig /= 10
+            }
+            results.addAll(tmpDigits.reversed()) // let's reverse it
+        } else {
+            results.add(fibOutput)
+        }
+
+        if (results.size >= n) return results.get(n - 1)
+    }
+
+    return -1 // nr lower than zero
+}
