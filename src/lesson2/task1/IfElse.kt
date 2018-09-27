@@ -66,20 +66,16 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    if (age in 1..199) {
-        val ageStr = age.toString()
-        if (ageStr.endsWith("1") && !ageStr.endsWith("11")) {
-            return "$ageStr год"
-        }
-        if ((ageStr.endsWith("2") || ageStr.endsWith("3") || ageStr.endsWith("4"))
-                && !ageStr.endsWith("12") && !ageStr.endsWith("13") && !ageStr.endsWith("14")) {
-            return "$ageStr года"
-        }
-        return "$ageStr лет"
+    val ageStr = age.toString()
+    return if (age % 10 == 1 && age % 100 != 11) {
+        "$ageStr год"
+    } else if ((age % 10 == 2 || age % 10 == 3 || age % 10 == 4)
+            && age % 100 != 12 && age % 100 != 13 && age % 100 != 14) {
+        "$ageStr года"
+    } else {
+        "$ageStr лет"
     }
-    return ""
 }
-
 
 /**
  * Простая
@@ -96,13 +92,13 @@ fun timeForHalfWay(t1: Double, v1: Double,
     var distance3 = t3 * v3
     val totalKmHalf = (distance1 + distance2 + distance3) / 2.0
 
-    if (totalKmHalf <= distance1) {
-        return totalKmHalf / v1
+    return if (totalKmHalf <= distance1) {
+        totalKmHalf / v1
+    } else if (totalKmHalf - distance1 <= distance2) {
+        t1 + (totalKmHalf - distance1) / v2
+    } else {
+        t1 + t2 + (totalKmHalf - distance1 - distance2) / v3
     }
-    if (totalKmHalf - distance1 <= distance2) {
-        return t1 + (totalKmHalf - distance1) / v2
-    }
-    return t1 + t2 + (totalKmHalf - distance1 - distance2) / v3
 }
 
 /**
@@ -126,8 +122,11 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
         return 2
     }
 
-    if (flagX1) return 1
-    return 0
+    return if (flagX1) {
+        1
+    } else {
+        0
+    }
 }
 
 /**
@@ -146,16 +145,18 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
     val threadFromRook = whichRookThreatens(kingX, kingY, rookX, rookY, Int.MIN_VALUE, Int.MIN_VALUE) == 1
 
     if (abs(kingX - bishopX) == abs(kingY - bishopY)) {
-        if (threadFromRook) {
-            return 3
+        return if (threadFromRook) {
+            3
+        } else {
+            2
         }
-        return 2
     }
 
-    if (threadFromRook) {
-        return 1
+    return if (threadFromRook) {
+        1
+    } else {
+        0
     }
-    return 0
 }
 
 /**
@@ -184,12 +185,13 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
         rightSide = pow(c, 2.0)
     }
 
-    if (leftSide == rightSide) { // right triangle
-        return 1
-    } else if (leftSide < rightSide) { // obtuse
-        return 2
-    } else { // acute
-        return 0
+    return when {
+        leftSide == rightSide -> // right triangle
+            1
+        leftSide < rightSide -> // obtuse
+            2
+        else -> // acute
+            0
     }
 }
 
@@ -206,15 +208,9 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
         return 0
     }
 
-    var firstB = b
-    var secondA = c
-    var secondB = d
-
-    if (a > c) {
-        firstB = d
-        secondA = a
-        secondB = b
-    }
+    val firstB = Math.min(b, d)
+    val secondA = Math.max(c, a)
+    val secondB = Math.max(d, b)
 
     var diff = firstB - secondA
 
@@ -222,8 +218,9 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
         diff = secondB - secondA
     }
 
-    if (diff < 0) {
-        return -1
+    return if (diff < 0) {
+        -1
+    } else {
+        diff
     }
-    return diff
 }

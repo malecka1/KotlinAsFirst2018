@@ -21,10 +21,7 @@ fun pointInsideCircle(x: Double, y: Double, x0: Double, y0: Double, r: Double) =
  */
 fun isNumberHappy(number: Int): Boolean {
     val charList = number.toString().toList()
-    if (charList.get(0).toInt().plus(charList.get(1).toInt()) == charList.get(2).toInt().plus(charList.get(3).toInt())) {
-        return true
-    }
-    return false
+    return (charList[0].toInt() + charList[1].toInt()) == (charList[2].toInt() + charList[3].toInt())
 }
 
 /**
@@ -34,14 +31,8 @@ fun isNumberHappy(number: Int): Boolean {
  * Определить, угрожают ли они друг другу. Вернуть true, если угрожают.
  * Считать, что ферзи не могут загораживать друг друга.
  */
-fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
-    if (x1 == x2 || y1 == y2) return true
-
-    if (Math.abs(x1 - x2) == Math.abs(y1 - y2)) return true
-
-    return false
-}
-
+fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
+        x1 == x2 || y1 == y2 || Math.abs(x1 - x2) == Math.abs(y1 - y2)
 
 /**
  * Простая
@@ -66,13 +57,8 @@ fun daysInMonth(month: Int, year: Int): Int {
  * Вернуть true, если утверждение верно
  */
 fun circleInside(x1: Double, y1: Double, r1: Double,
-                 x2: Double, y2: Double, r2: Double): Boolean {
-    if (x1 == x2 && y1 == y2) return r2 >= r1
-
-    val distance = sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0))
-
-    return distance <= r2 - r1
-}
+                 x2: Double, y2: Double, r2: Double): Boolean =
+        sqrt(Math.pow(x2 - x1, 2.0) + Math.pow(y2 - y1, 2.0)) <= r2 - r1
 
 /**
  * Средняя
@@ -87,10 +73,6 @@ fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
     val brickSortedList = intArrayOf(a, b, c).sortedArray()
     val holeSortedList = intArrayOf(r, s).sortedArray()
 
-    if (brickSortedList.get(0) <= holeSortedList.get(0)
-            && brickSortedList.get(1) <= holeSortedList.get(1)) {
-        return true
-    }
-
-    return false
+    return brickSortedList[0] <= holeSortedList[0]
+            && brickSortedList[1] <= holeSortedList[1]
 }
