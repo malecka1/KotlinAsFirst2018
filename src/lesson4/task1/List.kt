@@ -257,7 +257,7 @@ fun factorizeToString(n: Int): String =
 fun convert(n: Int, base: Int): List<Int> {
     val digitsInBase = mutableListOf<Int>()
     var orig = n
-    while (orig > base) {
+    while (orig >= base) {
         digitsInBase.add(orig % base)
         orig /= base
     }
@@ -275,7 +275,7 @@ fun convert(n: Int, base: Int): List<Int> {
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
 fun convertToString(n: Int, base: Int): String {
-    val numbersToLettersMaping = mapOf(10 to 'a', 11 to 'b', 12 to 'c', 13 to 'd', 14 to 'e', 15 to 'f', 16 to 'g',
+    val numbersToLettersMapping = mapOf(10 to 'a', 11 to 'b', 12 to 'c', 13 to 'd', 14 to 'e', 15 to 'f', 16 to 'g',
             17 to 'h', 18 to 'i', 19 to 'j', 20 to 'k', 21 to 'l', 22 to 'm', 23 to 'n', 24 to 'o', 25 to 'p', 26 to 'q',
             27 to 'r', 28 to 's', 29 to 't', 30 to 'u', 31 to 'v', 32 to 'w', 33 to 'x', 34 to 'y', 35 to 'z')
 
@@ -285,7 +285,7 @@ fun convertToString(n: Int, base: Int): String {
     while (iterate.hasNext()) {
         val nextValue = iterate.next()
         outputString += if (nextValue >= 10) {
-            numbersToLettersMaping[nextValue]
+            numbersToLettersMapping[nextValue]
         } else {
             nextValue
         }
