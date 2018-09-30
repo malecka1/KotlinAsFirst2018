@@ -116,26 +116,20 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double {
-    return if (v.isEmpty()) {
-        0.0
-    } else {
+fun abs(v: List<Double>): Double =
         Math.sqrt(v.sumByDouble { Math.pow(it, 2.0) })
-    }
-}
 
 /**
  * Простая
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double {
-    return if (list.isEmpty()) {
-        0.0
-    } else {
-        list.sum() / list.size
-    }
-}
+fun mean(list: List<Double>): Double =
+        if (list.isEmpty()) {
+            0.0
+        } else {
+            list.sum() / list.size
+        }
 
 /**
  * Средняя
@@ -146,12 +140,10 @@ fun mean(list: List<Double>): Double {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
-    if (list.isNotEmpty()) {
-        val mean = mean(list.toList())
-        val iterate = list.listIterator()
-        while (iterate.hasNext()) {
-            iterate.set(iterate.next() - mean)
-        }
+    val mean = mean(list)
+    val iterate = list.listIterator()
+    while (iterate.hasNext()) {
+        iterate.set(iterate.next() - mean)
     }
 
     return list
@@ -164,16 +156,8 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.0.
  */
-fun times(a: List<Double>, b: List<Double>): Double {
-    var product = 0.0
-    if (a.isNotEmpty() && b.isNotEmpty()) {
-        for (i in 0 until a.size) {
-            product += a[i] * b[i]
-        }
-    }
-
-    return product
-}
+fun times(a: List<Double>, b: List<Double>): Double =
+        a.zip(b).sumByDouble { it.first * it.second }
 
 /**
  * Средняя
@@ -183,16 +167,8 @@ fun times(a: List<Double>, b: List<Double>): Double {
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0.0 при любом x.
  */
-fun polynom(p: List<Double>, x: Double): Double {
-    var polynomValue = 0.0
-    if (p.isNotEmpty()) {
-        for (i in 0 until p.size) {
-            polynomValue += p[i] * Math.pow(x, i.toDouble())
-        }
-    }
-
-    return polynomValue
-}
+fun polynom(p: List<Double>, x: Double): Double =
+        p.foldIndexed(0.0, { index, total, element -> total + (element * Math.pow(x, index.toDouble())) })
 
 /**
  * Средняя
@@ -205,13 +181,11 @@ fun polynom(p: List<Double>, x: Double): Double {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Double>): MutableList<Double> {
-    if (list.isNotEmpty()) {
-        var sum = 0.0
-        val iterate = list.listIterator()
-        while (iterate.hasNext()) {
-            sum += iterate.next()
-            iterate.set(sum)
-        }
+    var sum = 0.0
+    val iterate = list.listIterator()
+    while (iterate.hasNext()) {
+        sum += iterate.next()
+        iterate.set(sum)
     }
 
     return list
@@ -234,7 +208,7 @@ fun factorize(n: Int): List<Int> {
         }
     }
 
-    return factors.sorted()
+    return factors
 }
 
 /**
@@ -275,23 +249,17 @@ fun convert(n: Int, base: Int): List<Int> {
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
 fun convertToString(n: Int, base: Int): String {
-    val numbersToLettersMapping = mapOf(10 to 'a', 11 to 'b', 12 to 'c', 13 to 'd', 14 to 'e', 15 to 'f', 16 to 'g',
-            17 to 'h', 18 to 'i', 19 to 'j', 20 to 'k', 21 to 'l', 22 to 'm', 23 to 'n', 24 to 'o', 25 to 'p', 26 to 'q',
-            27 to 'r', 28 to 's', 29 to 't', 30 to 'u', 31 to 'v', 32 to 'w', 33 to 'x', 34 to 'y', 35 to 'z')
-
     val digitsInBase = convert(n, base)
-    var outputString = ""
-    val iterate = digitsInBase.listIterator()
-    while (iterate.hasNext()) {
-        val nextValue = iterate.next()
-        outputString += if (nextValue >= 10) {
-            numbersToLettersMapping[nextValue]
+    val outputSB = StringBuilder()
+    for (digit in digitsInBase) {
+        outputSB.append(if (digit >= 10) {
+            (digit + 87).toChar()
         } else {
-            nextValue
-        }
+            digit
+        })
     }
 
-    return outputString
+    return outputSB.toString()
 }
 
 /**
@@ -324,16 +292,12 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * Например: str = "13c", base = 14 -> 250
  */
 fun decimalFromString(str: String, base: Int): Int {
-    val lettersToNumbersMap = mutableMapOf('a' to 10, 'b' to 11, 'c' to 12, 'd' to 13, 'e' to 14, 'f' to 15, 'g' to 16,
-            'h' to 17, 'i' to 18, 'j' to 19, 'k' to 20, 'l' to 21, 'm' to 22, 'n' to 23, 'o' to 24, 'p' to 25, 'q' to 26,
-            'r' to 27, 's' to 28, 't' to 29, 'u' to 30, 'v' to 31, 'w' to 32, 'x' to 33, 'y' to 34, 'z' to 35)
-
     val digitsList = mutableListOf<Int>()
     for (c in str) {
         if (c.isDigit()) {
             digitsList.add(Integer.parseInt(c.toString()))
         } else {
-            digitsList.add(lettersToNumbersMap[c]!!.toInt())
+            digitsList.add(c.toInt() - 87)
         }
     }
 
@@ -352,16 +316,16 @@ fun roman(n: Int): String {
     val romanLettersSorted = listOf<String>("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
     val numbersSorted = listOf<Int>(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
     var number = n
-    var outputString = ""
+    val outputSB = StringBuilder()
 
     for (i in 0 until numbersSorted.size) {
         while (number >= numbersSorted[i]) {
             number -= numbersSorted[i]
-            outputString += romanLettersSorted[i]
+            outputSB.append(romanLettersSorted[i])
         }
     }
 
-    return outputString
+    return outputSB.toString()
 }
 
 /**

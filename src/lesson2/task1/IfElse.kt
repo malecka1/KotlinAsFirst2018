@@ -65,17 +65,15 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String {
-    val ageStr = age.toString()
-    return if (age % 10 == 1 && age % 100 != 11) {
-        "$ageStr год"
-    } else if ((age % 10 == 2 || age % 10 == 3 || age % 10 == 4)
-            && age % 100 != 12 && age % 100 != 13 && age % 100 != 14) {
-        "$ageStr года"
-    } else {
-        "$ageStr лет"
-    }
-}
+fun ageDescription(age: Int): String =
+        if (age % 10 == 1 && age % 100 != 11) {
+            "$age год"
+        } else if ((age % 10 == 2 || age % 10 == 3 || age % 10 == 4)
+                && age % 100 != 12 && age % 100 != 13 && age % 100 != 14) {
+            "$age года"
+        } else {
+            "$age лет"
+        }
 
 /**
  * Простая
@@ -114,19 +112,20 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
                        rookX2: Int, rookY2: Int): Int {
     var flagX1 = false
+    var result = 0
     if (kingX == rookX1 || kingY == rookY1) flagX1 = true
     if (kingX == rookX2 || kingY == rookY2) {
         if (flagX1) {
-            return 3
+            result++
         }
-        return 2
+        result += 2
     }
 
-    return if (flagX1) {
-        1
-    } else {
-        0
+    if (flagX1 && result == 0) {
+        result = 1
     }
+
+    return result
 }
 
 /**
@@ -144,19 +143,19 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           bishopX: Int, bishopY: Int): Int {
     val threadFromRook = whichRookThreatens(kingX, kingY, rookX, rookY, Int.MIN_VALUE, Int.MIN_VALUE) == 1
 
+    var result = 0
     if (abs(kingX - bishopX) == abs(kingY - bishopY)) {
-        return if (threadFromRook) {
-            3
-        } else {
-            2
+        if (threadFromRook) {
+            result++
         }
+        result += 2
     }
 
-    return if (threadFromRook) {
-        1
-    } else {
-        0
+    if (threadFromRook && result == 0) {
+        result = 1
     }
+
+    return result
 }
 
 /**
@@ -169,20 +168,21 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
     // a^2 + b^2 = c^2
-    var leftSide: Double
-    var rightSide: Double
-    if (a > b && a > c) {
-        if (a > b + c) return -1
-        leftSide = pow(b, 2.0) + pow(c, 2.0)
-        rightSide = pow(a, 2.0)
-    } else if (b > a && b > c) {
-        if (b > a + c) return -1
-        leftSide = pow(a, 2.0) + pow(c, 2.0)
-        rightSide = pow(b, 2.0)
-    } else {
-        if (c > a + b) return -1
-        leftSide = pow(a, 2.0) + pow(b, 2.0)
-        rightSide = pow(c, 2.0)
+    val max = maxOf(a, b, c)
+    val rightSide = pow(max, 2.0)
+    val leftSide = when {
+        a == max -> {
+            if (a > b + c) return -1
+            pow(b, 2.0) + pow(c, 2.0)
+        }
+        b == max -> {
+            if (b > a + c) return -1
+            pow(a, 2.0) + pow(c, 2.0)
+        }
+        else -> {
+            if (c > a + b) return -1
+            pow(a, 2.0) + pow(b, 2.0)
+        }
     }
 
     return when {
@@ -204,19 +204,7 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    if (c == b) {
-        return 0
-    }
-
-    val firstB = Math.min(b, d)
-    val secondA = Math.max(c, a)
-    val secondB = Math.max(d, b)
-
-    var diff = firstB - secondA
-
-    if (firstB > secondB) {
-        diff = secondB - secondA
-    }
+    val diff = Math.min(b, d) - Math.max(c, a)
 
     return if (diff < 0) {
         -1

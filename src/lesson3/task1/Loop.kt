@@ -2,6 +2,7 @@
 
 package lesson3.task1
 
+import java.math.BigDecimal
 import kotlin.math.PI
 import kotlin.math.sqrt
 
@@ -130,7 +131,7 @@ fun minDivisor(n: Int): Int {
         return 2
     } else {
         for (i in 3..Math.floor(Math.sqrt(n.toDouble())).toInt() step 2) {
-            if (isPrime(i) && n % i == 0) {
+            if (n % i == 0) {
                 return i
             }
         }
@@ -145,11 +146,7 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int =
-        if (isPrime(n)) {
-            1
-        } else {
-            n / minDivisor(n)
-        }
+        n / minDivisor(n)
 
 /**
  * Простая
@@ -211,22 +208,23 @@ fun collatzSteps(x: Int): Int {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun sin(x: Double, eps: Double): Double {
-    var arg = x
-    if (arg >= 2 * PI) {
-        arg %= 2 * PI
-    }
-    if (arg == 0.0) return 0.0
+    val arg = x % (2 * PI)
+    val myEps = BigDecimal.valueOf(eps)
 
-    var output = 0.0
-    var theLastNumber = Double.MAX_VALUE
-    var i = 0
-    while (Math.abs(theLastNumber) >= eps) {
-        theLastNumber = (Math.pow(-1.0, i.toDouble()) * Math.pow(arg, 2 * i + 1.0)) / factorial(2 * i + 1)
+    var lastFactorial = BigDecimal.ONE
+    var lastArgPow = BigDecimal.valueOf(arg)
+    var theLastNumber = lastArgPow / lastFactorial
+    var output = theLastNumber
+    var i = 3
+    while (theLastNumber.abs() >= myEps) {
+        lastFactorial *= BigDecimal.valueOf(i * (i - 1.0))
+        lastArgPow *= BigDecimal.valueOf(arg * arg * -1.0)
+        theLastNumber = lastArgPow / lastFactorial
         output += theLastNumber
-        i++
+        i += 2
     }
 
-    return output - output % eps
+    return (output - output % myEps).toDouble()
 }
 
 /**
@@ -237,22 +235,24 @@ fun sin(x: Double, eps: Double): Double {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun cos(x: Double, eps: Double): Double {
-    var arg = x
-    if (arg >= 2 * PI) {
-        arg %= 2 * PI
-    }
-    if (arg == 0.0) return 1.0
+    val arg = x % (2 * PI)
+    val myEps = BigDecimal.valueOf(eps)
 
-    var output = 0.0
-    var theLastNumber = Double.MAX_VALUE
-    var i = 0
-    while (Math.abs(theLastNumber) >= eps) {
-        theLastNumber = (Math.pow(-1.0, i.toDouble()) * Math.pow(arg, 2.0 * i)) / factorial(2 * i)
+    var lastFactorial = BigDecimal.ONE
+    var lastArgPow = BigDecimal.ONE
+    var theLastNumber = BigDecimal.ONE
+    var output = theLastNumber
+    var i = 2
+
+    while (theLastNumber.abs() >= myEps) {
+        lastFactorial *= BigDecimal.valueOf(i * (i - 1.0))
+        lastArgPow *= BigDecimal.valueOf(arg * arg * -1.0)
+        theLastNumber = lastArgPow / lastFactorial
         output += theLastNumber
-        i++
+        i += 2
     }
 
-    return output - output % eps
+    return (output - output % myEps).toDouble()
 }
 
 /**
@@ -316,27 +316,8 @@ fun hasDifferentDigits(n: Int): Boolean {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int {
-    var nrDigitsPassed = 0
-    for (i in 1..n) {
-        var powOutput = i * i
-        val digitNumber = digitNumber(powOutput)
-        nrDigitsPassed += digitNumber
-
-        if (nrDigitsPassed >= n) {
-            return if (digitNumber == 1) powOutput else {
-                var j = 0
-                while (j < (nrDigitsPassed - n)) {
-                    powOutput /= 10
-                    j++
-                }
-                powOutput % 10
-            }
-        }
-    }
-
-    return -1 // nr lower than zero
-}
+fun squareSequenceDigit(n: Int): Int =
+        sequenceDigitLogic(n, { i -> i * i })
 
 /**
  * Сложная
@@ -347,21 +328,24 @@ fun squareSequenceDigit(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int {
+fun fibSequenceDigit(n: Int): Int =
+        sequenceDigitLogic(n, { i -> fib(i) })
+
+fun sequenceDigitLogic(n: Int, f: (i: Int) -> Int): Int {
     var nrDigitsPassed = 0
     for (i in 1..n) {
-        var fibOutput = fib(i)
-        val digitNumber = digitNumber(fibOutput)
+        var fcOutput = f(i)
+        val digitNumber = digitNumber(fcOutput)
         nrDigitsPassed += digitNumber
 
         if (nrDigitsPassed >= n) {
-            return if (digitNumber == 1) fibOutput else {
+            return if (digitNumber == 1) fcOutput else {
                 var j = 0
                 while (j < (nrDigitsPassed - n)) {
-                    fibOutput /= 10
+                    fcOutput /= 10
                     j++
                 }
-                fibOutput % 10
+                fcOutput % 10
             }
         }
     }
