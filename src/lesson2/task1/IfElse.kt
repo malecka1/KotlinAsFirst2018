@@ -111,18 +111,13 @@ fun timeForHalfWay(t1: Double, v1: Double,
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
                        rookX2: Int, rookY2: Int): Int {
-    var flagX1 = false
-    var result = 0
-    if (kingX == rookX1 || kingY == rookY1) flagX1 = true
-    if (kingX == rookX2 || kingY == rookY2) {
-        if (flagX1) {
-            result++
-        }
-        result += 2
-    }
 
-    if (flagX1 && result == 0) {
-        result = 1
+    var result = 0
+    if (kingX == rookX1 || kingY == rookY1) {
+        result++
+    }
+    if (kingX == rookX2 || kingY == rookY2) {
+        result += 2
     }
 
     return result
@@ -141,18 +136,12 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
                           bishopX: Int, bishopY: Int): Int {
-    val threadFromRook = whichRookThreatens(kingX, kingY, rookX, rookY, Int.MIN_VALUE, Int.MIN_VALUE) == 1
-
     var result = 0
-    if (abs(kingX - bishopX) == abs(kingY - bishopY)) {
-        if (threadFromRook) {
-            result++
-        }
-        result += 2
+    if (whichRookThreatens(kingX, kingY, rookX, rookY, Int.MIN_VALUE, Int.MIN_VALUE) == 1) {
+        result++
     }
-
-    if (threadFromRook && result == 0) {
-        result = 1
+    if (abs(kingX - bishopX) == abs(kingY - bishopY)) {
+        result += 2
     }
 
     return result
@@ -169,29 +158,18 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
 fun triangleKind(a: Double, b: Double, c: Double): Int {
     // a^2 + b^2 = c^2
     val max = maxOf(a, b, c)
+    val min = minOf(a, b, c)
+    val middle = a + b + c - max - min
+
+    if (max > middle + min) return -1
+
     val rightSide = pow(max, 2.0)
-    val leftSide = when {
-        a == max -> {
-            if (a > b + c) return -1
-            pow(b, 2.0) + pow(c, 2.0)
-        }
-        b == max -> {
-            if (b > a + c) return -1
-            pow(a, 2.0) + pow(c, 2.0)
-        }
-        else -> {
-            if (c > a + b) return -1
-            pow(a, 2.0) + pow(b, 2.0)
-        }
-    }
+    val leftSide = pow(min, 2.0) + pow(middle, 2.0)
 
     return when {
-        leftSide == rightSide -> // right triangle
-            1
-        leftSide < rightSide -> // obtuse
-            2
-        else -> // acute
-            0
+        leftSide == rightSide -> 1
+        leftSide < rightSide -> 2
+        else -> 0
     }
 }
 
