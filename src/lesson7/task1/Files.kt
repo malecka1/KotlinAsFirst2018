@@ -127,10 +127,11 @@ fun centerFile(inputName: String, outputName: String) {
     var max = 0
     val textList: MutableList<String> = mutableListOf()
     File(inputName).readLines().forEach { line ->
-        if (line.length > max) {
-            max = line.length
+        val cl = line.trim()
+        if (cl.length > max) {
+            max = cl.length
         }
-        textList.add(line.trim())
+        textList.add(cl)
     }
 
     val sb = StringBuilder()

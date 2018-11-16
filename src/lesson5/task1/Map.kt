@@ -406,7 +406,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     treasures.forEach { name, weightPricePair ->
         rationToNamePairList.add(Pair(weightPricePair.second.toDouble() / weightPricePair.first, name))
     }
-    rationToNamePairList.sortBy { it.first }
+    rationToNamePairList.sortByDescending { it.first }
 
     var remCap = capacity
     val outputSet: MutableSet<String> = mutableSetOf()
