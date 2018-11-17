@@ -136,15 +136,13 @@ fun centerFile(inputName: String, outputName: String) {
 
     val sb = StringBuilder()
     for (line in textList) {
-        if (line.length == max) {
-            sb.append(line + "\n")
-            continue
-
-        }
-
         val spTotal = max - line.length
         val before = Math.floor(spTotal / 2.0).toInt()
-        sb.append(String.format("%" + before + "s%s\n", "", line))
+        if (before < 1) {
+            sb.append(line + "\n")
+        } else {
+            sb.append(String.format("%" + before + "s%s\n", "", line))
+        }
     }
 
     File(outputName).writeText(sb.toString())
@@ -178,7 +176,46 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    var max = 0
+    val textList: MutableList<String> = mutableListOf()
+    File(inputName).readLines().forEach { line ->
+        val cl = line.trim().replace("\\s+".toRegex(), " ")
+        if (cl.length > max) {
+            max = cl.length
+        }
+        textList.add(cl)
+    }
+
+    val sb = StringBuilder()
+    for (line in textList) {
+        if (line.length == max) {
+            sb.append(line + "\n")
+            continue
+        }
+        val words = line.split(" ")
+        when {
+            words.size == 1 -> sb.append(words[0])
+            words.size > 1 -> {
+                val spTotal = max - line.length + words.size - 1
+                val nrC = spTotal / (words.size - 1)
+                var nrL = spTotal % (words.size - 1)
+                val wordsIt = words.iterator()
+                while (nrL > 0) {
+                    sb.append(wordsIt.next()).append(" ".repeat(nrC + 1))
+                    nrL--
+                }
+                wordsIt.forEachRemaining { w ->
+                    sb.append(w)
+                    if (w != words.last()) {
+                        sb.append(" ".repeat(nrC))
+                    }
+                }
+            }
+        }
+        sb.append("\n")
+    }
+
+    File(outputName).writeText(sb.toString())
 }
 
 /**

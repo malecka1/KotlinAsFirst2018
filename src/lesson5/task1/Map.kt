@@ -201,7 +201,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var output = ""
+    var output: String? = null
     var cBest = Double.MAX_VALUE
     stuff.forEach { t, u ->
         if (u.first == kind && u.second < cBest) {
@@ -298,8 +298,10 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     var result = true
+    val lChars: MutableSet<Char> = mutableSetOf()
+    chars.forEach { c -> lChars.add(c.toLowerCase()) }
     for (c in word) {
-        if (!chars.contains(c)) {
+        if (!chars.contains(c.toLowerCase())) {
             result = false
             break
         }
@@ -374,7 +376,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     for ((key, value) in tmpMap) {
         val i = tmpMap[number - key]
         if (i != null && i != value) {
-            result = if (i < value) {
+            result = if (i <= value) {
                 Pair(i, value)
             } else {
                 Pair(value, i)
@@ -413,14 +415,14 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     rationToNamePairList.sortByDescending { it.first }
 
     var remCap = capacity
-    val outputSet: MutableSet<String> = mutableSetOf()
+    val outputList: MutableList<String> = mutableListOf()
     rationToNamePairList.forEach(Consumer { it ->
         val currPair: Pair<Int, Int>? = treasures[it.second]
         if (currPair!!.first <= remCap) {
-            outputSet.add(it.second)
+            outputList.add(it.second)
             remCap -= currPair.first
         }
     })
 
-    return outputSet
+    return outputList.sortedDescending().toSet()
 }
