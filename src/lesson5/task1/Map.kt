@@ -163,13 +163,13 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
-    var code = ""
+    var code: String? = null
     var counter = 0
     var amount = 0.0
     val outputMap: MutableMap<String, Double> = mutableMapOf()
     for ((key, value) in stockPrices.toList().sortedBy { pair -> pair.first }) {
         if (code != key) {
-            if (code != "")
+            if (code != null)
                 outputMap[code] = amount / counter
             code = key
             counter = 1
@@ -179,7 +179,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
             amount += value
         }
     }
-    if (code != "")
+    if (code != null)
         outputMap[code] = amount / counter
 
     return outputMap.toMap()
@@ -201,7 +201,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var output: String? = null
+    var output = ""
     var cBest = Double.MAX_VALUE
     stuff.forEach { t, u ->
         if (u.first == kind && u.second < cBest) {
@@ -282,8 +282,8 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit =
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    val output: MutableList<String> = a.toMutableList()
-    output.addAll(b)
+    val output: MutableList<String> = a.toSet().toMutableList()
+    output.addAll(b.toSet())
     return output.groupingBy { it }.eachCount().filter { it.value > 1 }.keys.toList()
 }
 
@@ -333,10 +333,14 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  */
 fun hasAnagrams(words: List<String>): Boolean {
     var result = false
+    val db: MutableSet<String> = mutableSetOf()
     for (word in words) {
-        if (words.contains(word.reversed())) {
+        val curChars = word.groupingBy { it }.eachCount().keys.sorted().toString()
+        if (db.contains(curChars)) {
             result = true
             break
+        } else {
+            db.add(curChars)
         }
     }
     return result
@@ -362,7 +366,7 @@ fun hasAnagrams(words: List<String>): Boolean {
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     var result = Pair(-1, -1)
     val tmpMap = mutableMapOf<Int, Int>()
-    for ((index, value) in list.asReversed().withIndex()) {
+    for ((index, value) in list.withIndex()) {
         if (value <= number) {
             tmpMap[value] = index
         }
