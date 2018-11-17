@@ -299,9 +299,15 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     var result = true
     val lChars: MutableSet<Char> = mutableSetOf()
-    chars.forEach { c -> lChars.add(c.toLowerCase()) }
+    chars.forEach { c ->
+        if (c.isLetter()) {
+            lChars.add(c.toLowerCase())
+        } else {
+            lChars.add(c)
+        }
+    }
     for (c in word) {
-        if (!chars.contains(c.toLowerCase())) {
+        if (!chars.contains(c) && !chars.contains(c.toLowerCase())) {
             result = false
             break
         }
@@ -367,23 +373,36 @@ fun hasAnagrams(words: List<String>): Boolean {
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     var result = Pair(-1, -1)
+    var halfList = mutableListOf<Int>()
     val tmpMap = mutableMapOf<Int, Int>()
     for ((index, value) in list.withIndex()) {
         if (value <= number) {
             tmpMap[value] = index
         }
-    }
-    for ((key, value) in tmpMap) {
-        val i = tmpMap[number - key]
-        if (i != null && i != value) {
-            result = if (i <= value) {
-                Pair(i, value)
-            } else {
-                Pair(value, i)
-            }
-            break
+        if (number / 2 == value) {
+            halfList.add(index)
         }
     }
+
+    for ((key, value) in tmpMap) {
+        val i = tmpMap[number - key]
+        if (i != null) {
+            if (i != value) {
+                result = if (i < value) {
+                    Pair(i, value)
+                } else {
+                    Pair(value, i)
+                }
+                break
+            } else {
+                if (halfList.size >= 2) {
+                    result = Pair(halfList[0], halfList[1])
+                    break
+                }
+            }
+        }
+    }
+
     return result
 }
 
@@ -410,7 +429,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // NP-complete so let's try some basic heuristic of ratio price/weight to be at least close to the optimal solution
     val rationToNamePairList: MutableList<Pair<Double, String>> = mutableListOf()
     treasures.forEach { name, weightPricePair ->
-        rationToNamePairList.add(Pair(weightPricePair.second.toDouble() / weightPricePair.first, name))
+        rationToNamePairList.add(Pair(weightPricePair.first / weightPricePair.second.toDouble(), name))
     }
     rationToNamePairList.sortByDescending { it.first }
 
@@ -424,5 +443,5 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
     })
 
-    return outputList.sortedDescending().toSet()
+    return outputList.toSet()
 }
