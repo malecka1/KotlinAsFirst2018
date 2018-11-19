@@ -3,7 +3,6 @@
 package lesson5.task1
 
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * Пример
@@ -425,23 +424,80 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
+class BagPackSolution(capacity: Int) {
+    var value: Int = 0
+    var items: IntArray = IntArray(capacity)
+}
+
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    // NP-complete so let's try some basic heuristic of ratio price/weight to be at least close to the optimal solution
-    val rationToNamePairList: MutableList<Pair<Double, String>> = mutableListOf()
-    treasures.forEach { name, weightPricePair ->
-        rationToNamePairList.add(Pair(weightPricePair.first / weightPricePair.second.toDouble(), name))
+    // NP-complete so let's try branch and bound method
+    val bestSol = BagPackSolution(treasures.size)
+    val weightArray = IntArray(treasures.size)
+    val valueArray = IntArray(treasures.size)
+    val currentItems = IntArray(treasures.size)
+    var j = 0
+    for ((_, value) in treasures) {
+        weightArray[j] = value.first
+        valueArray[j] = value.second
+        currentItems[j] = 0
+        bestSol.items!![j] = 0
+        j++
     }
-    rationToNamePairList.sortByDescending { it.first }
 
-    var remCap = capacity
-    val outputList: MutableList<String> = mutableListOf()
-    rationToNamePairList.forEach(Consumer { it ->
-        val currPair: Pair<Int, Int>? = treasures[it.second]
-        if (currPair!!.first <= remCap) {
-            outputList.add(it.second)
-            remCap -= currPair.first
+    // start recursions
+    for (i in 0 until treasures.size) {
+        if (weightArray[i] <= capacity) {
+            solveBB(i, 0, 0, capacity, treasures.size, currentItems, weightArray, valueArray, bestSol)
         }
-    })
+    }
 
-    return outputList.toSet()
+    // map to items' names
+    val outputSet = mutableSetOf<String>()
+    for (i in 0 until treasures.size) {
+        if (bestSol.items!![i] == 1) {
+            outputSet.add(treasures.keys.elementAt(i))
+        }
+    }
+
+    return outputSet
+}
+
+/**
+ * Helper method for BB solution below.
+ *
+ * @param currentItemIndex
+ * @param weight              current weight sum
+ * @param value               current value sum
+ * @param instanceMaxCapacity
+ * @param instanceStuffCount
+ * @param currentItems
+ * @param weightArray
+ * @param valueArray
+ * @param bestSol
+ */
+private fun solveBB(currentItemIndex: Int, weight: Int, value: Int, instanceMaxCapacity: Int, instanceStuffCount: Int,
+                    currentItems: IntArray, weightArray: IntArray, valueArray: IntArray, bestSol: BagPackSolution) {
+    currentItems[currentItemIndex] += 1 // add one instance to solution
+    val weightTmp = weight + weightArray[currentItemIndex]
+    val valueTmp = value + valueArray[currentItemIndex]
+
+    if (weightTmp <= instanceMaxCapacity) {
+        if (valueTmp > bestSol.value) {
+            bestSol.value = valueTmp
+            bestSol.items = Arrays.copyOf(currentItems, currentItems.size)
+        }
+
+        for (i in currentItemIndex + 1 until instanceStuffCount) { // 0/1 variant, otherwise without adding
+            var restValue = 0
+            for (j in i until instanceStuffCount) {
+                restValue += valueArray[j]
+            }
+            // do not call recursion if there cannot be any better solution in this branch
+            if (valueTmp + restValue > bestSol.value) {
+                solveBB(i, weightTmp, valueTmp, instanceMaxCapacity, instanceStuffCount, currentItems, weightArray, valueArray, bestSol)
+            }
+        }
+    }
+
+    currentItems[currentItemIndex] -= 1 // remove one instance from solution
 }
