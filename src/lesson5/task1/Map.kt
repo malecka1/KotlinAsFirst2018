@@ -440,7 +440,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         weightArray[j] = value.first
         valueArray[j] = value.second
         currentItems[j] = 0
-        bestSol.items!![j] = 0
+        bestSol.items[j] = 0
         j++
     }
 
@@ -454,7 +454,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // map to items' names
     val outputSet = mutableSetOf<String>()
     for (i in 0 until treasures.size) {
-        if (bestSol.items!![i] == 1) {
+        if (bestSol.items[i] == 1) {
             outputSet.add(treasures.keys.elementAt(i))
         }
     }
