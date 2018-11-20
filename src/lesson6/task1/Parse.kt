@@ -73,7 +73,7 @@ fun main(args: Array<String>) {
  */
 fun dateStrToDigit(str: String): String {
     var outputStr = ""
-    if (str != "" && str.matches("\\d{1,2} \\p{L}+ \\d{1,4}".toRegex())) {
+    if (str != "" && str.matches("\\d{1,2} \\p{L}+ \\d+}".toRegex())) {
         val vals = str.split(" ")
         val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
                 "ноября", "декабря")
@@ -102,7 +102,7 @@ fun dateStrToDigit(str: String): String {
  */
 fun dateDigitToStr(digital: String): String {
     var outputStr = ""
-    if (digital != "" && digital.matches("\\d{2}.\\d{2}.\\d{4}".toRegex())) {
+    if (digital != "" && digital.matches("\\d{2}.\\d{2}.\\d+".toRegex())) {
         val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
                 "ноября", "декабря")
         val vals = digital.split(".")
@@ -149,7 +149,7 @@ fun bestLongJump(jumps: String): Int {
     val re = Regex("[^\\d %\\-]")
     if (!jumps.contains(re)) {
         jumps.split(" ").forEach { value ->
-            if (!value.contains("[^\\d]".toRegex()) && value.toInt() > outputInt) {
+            if (value != "" && !value.contains("[^\\d]".toRegex()) && value.toInt() > outputInt) {
                 outputInt = value.toInt()
             }
         }
@@ -220,11 +220,13 @@ fun plusMinus(expression: String): Int {
  */
 fun firstDuplicateIndex(str: String): Int {
     var outputInt = -1
-    if (str.matches("^(\\p{L}+ )*\\p{L}+".toRegex())) {
+    if (str.matches("^(.+ )*.+".toRegex())) {
         var prev = Pair("", 0)
         val words = str.split(" ")
         for (word in words) {
-            if (word.toLowerCase() == prev.first) {
+            if (word.matches("[^\\p{L}]".toRegex())) {
+                prev = Pair(word, prev.second + word.length + 1)
+            } else if (word.toLowerCase() == prev.first) {
                 outputInt = prev.second - word.length - 1
                 break
             } else {
@@ -248,12 +250,16 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     var outputStr = ""
-    if (description.matches("^(\\p{L}+ \\d+\\.\\d+; )*\\p{L}+ \\d+\\.\\d+".toRegex())) {
+    if (description.matches("^(.+ \\d+\\.\\d+; )*.+ \\d+\\.\\d+".toRegex())) {
         var best = Pair("", 0.0)
         description.split("; ").forEach { item ->
             val vals = item.split(" ")
             if (vals[1].toDouble() > best.second) {
-                best = Pair(vals[0], vals[1].toDouble())
+                best = if (vals[0].contains("[^\\p{L}]".toRegex())) {
+                    Pair("Any good with price " + vals[1].toDouble(), vals[1].toDouble()) // ? this output has not been specified
+                } else {
+                    Pair(vals[0], vals[1].toDouble())
+                }
             }
         }
         outputStr = best.first

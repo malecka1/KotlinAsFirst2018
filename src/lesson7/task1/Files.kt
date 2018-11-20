@@ -237,13 +237,12 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  *
  */
 fun top20Words(inputName: String): Map<String, Int> {
-    val re = Regex("[^\\p{L}\\s]")
-    val text = File(inputName).readText().replace(re, "").toLowerCase()
-//    print(text) // TODO
+    val re = Regex("[^\\p{L} ]")
+    val text = File(inputName).readText().replace(re, "").toLowerCase().replace("\\s{2,}".toRegex(), "")
     return if (text.isBlank()) {
         emptyMap()
     } else {
-        text.split("\\s+".toRegex()).groupingBy { it }.eachCount().toList().sortedByDescending { it.second }.take(20).toMap()
+        text.split(" ").groupingBy { it }.eachCount().toList().sortedByDescending { it.second }.take(20).toMap()
     }
 }
 
