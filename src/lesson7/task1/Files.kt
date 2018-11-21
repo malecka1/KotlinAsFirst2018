@@ -237,8 +237,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  *
  */
 fun top20Words(inputName: String): Map<String, Int> {
-    val re = Regex("[^\\p{L} ]")
-    val text = File(inputName).readText().replace(re, "").toLowerCase().replace("\\s{2,}".toRegex(), "")
+    val text = File(inputName).readText().replace("\\n", " ").replace("[[^\\p{L}]\\d/]".toRegex(), " ").trim().replace("\\s+".toRegex(), " ").toLowerCase()
     return if (text.isBlank()) {
         emptyMap()
     } else {

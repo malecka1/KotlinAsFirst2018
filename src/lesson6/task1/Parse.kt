@@ -73,7 +73,7 @@ fun main(args: Array<String>) {
  */
 fun dateStrToDigit(str: String): String {
     var outputStr = ""
-    if (str != "" && str.matches("\\d{1,2} \\p{L}+ \\d+}".toRegex())) {
+    if (str != "" && str.matches("\\d{1,2} \\p{L}+ \\d+".toRegex())) {
         val vals = str.split(" ")
         val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
                 "ноября", "декабря")
@@ -102,10 +102,11 @@ fun dateStrToDigit(str: String): String {
  */
 fun dateDigitToStr(digital: String): String {
     var outputStr = ""
-    if (digital != "" && digital.matches("\\d{2}.\\d{2}.\\d+".toRegex())) {
+    if (digital != "" && digital.matches("\\d{2}.\\d{2}.\\d{4}".toRegex())) {
         val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
                 "ноября", "декабря")
         val vals = digital.split(".")
+        println(vals[1].toInt())
         if (vals[1].toInt() - 1 in 0..11) {
             outputStr = vals[0].toInt().toString() + " " + months[vals[1].toInt() - 1] + " " + vals[2]
         }
@@ -170,10 +171,15 @@ fun bestLongJump(jumps: String): Int {
 fun bestHighJump(jumps: String): Int {
     var outputInt = -1
     if (jumps.matches("^(\\d+ %{0,2}[-+%] ?)+".toRegex())) {
-        val vals = jumps.split(" ")
-        for (i in 0 until vals.size step 2) {
-            if (vals[i + 1].endsWith("+") && vals[i].toInt() > outputInt) {
-                outputInt = vals[i].toInt()
+        jumps.split(" %{0,2}[+] ?".toRegex()).forEach { it ->
+            val lastSp = it.indexOfLast { c -> c == ' ' }
+            val v = if (lastSp != -1) {
+                it.substring(lastSp + 1)
+            } else {
+                it
+            }
+            if (v.toIntOrNull() != null && v.toInt() > outputInt) {
+                outputInt = v.toInt()
             }
         }
     }
@@ -224,13 +230,18 @@ fun firstDuplicateIndex(str: String): Int {
         var prev = Pair("", 0)
         val words = str.split(" ")
         for (word in words) {
-            if (word.matches("[^\\p{L}]".toRegex())) {
-                prev = Pair(word, prev.second + word.length + 1)
-            } else if (word.toLowerCase() == prev.first) {
+            if (word.toLowerCase() == prev.first) {
                 outputInt = prev.second - word.length - 1
                 break
             } else {
-                prev = Pair(word.toLowerCase(), prev.second + word.length + 1)
+                val minusWhat = word.count { word.contains('\\') } - word.windowed(2) { it ->
+                    if (it == "\\\\") {
+                        1
+                    } else {
+                        0
+                    }
+                }.sum()
+                prev = Pair(word.toLowerCase(), prev.second + word.length + 1 - minusWhat)
             }
         }
     }
@@ -278,7 +289,26 @@ fun mostExpensive(description: String): String {
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    var output = 0
+    if (roman.matches("[IVXLCDM]+".toRegex())) {
+        val romLatMap = hashMapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
+        var prev = 0
+        for (c in roman.reversed()) {
+            val l = romLatMap[c]!!.toInt()
+            if (l < prev) {
+                output -= l
+            } else {
+                output += l
+            }
+            prev = l
+        }
+    } else {
+        output = -1
+    }
+
+    return output
+}
 
 /**
  * Очень сложная
