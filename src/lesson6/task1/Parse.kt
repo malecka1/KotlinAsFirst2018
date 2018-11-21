@@ -102,7 +102,7 @@ fun dateStrToDigit(str: String): String {
  */
 fun dateDigitToStr(digital: String): String {
     var outputStr = ""
-    if (digital != "" && digital.matches("\\d{2}.\\d{2}.\\d{4}".toRegex())) {
+    if (digital != "" && digital.matches("\\d{2}.\\d{2}.\\d{4,}".toRegex())) {
         val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
                 "ноября", "декабря")
         val vals = digital.split(".")
@@ -234,7 +234,7 @@ fun firstDuplicateIndex(str: String): Int {
                 outputInt = prev.second - word.length - 1
                 break
             } else {
-                val minusWhat = word.count { word.contains('\\') } - word.windowed(2) { it ->
+                val minusWhat = word.windowed(2) { it ->
                     if (it == "\\\\") {
                         1
                     } else {
@@ -266,11 +266,7 @@ fun mostExpensive(description: String): String {
         description.split("; ").forEach { item ->
             val vals = item.split(" ")
             if (vals[1].toDouble() > best.second) {
-                best = if (vals[0].contains("[^\\p{L}]".toRegex())) {
-                    Pair("Any good with price " + vals[1].toDouble(), vals[1].toDouble()) // ? this output has not been specified
-                } else {
-                    Pair(vals[0], vals[1].toDouble())
-                }
+                best = Pair(vals[0], vals[1].toDouble())
             }
         }
         outputStr = best.first
