@@ -72,21 +72,20 @@ fun main(args: Array<String>) {
  * входными данными.
  */
 fun dateStrToDigit(str: String): String {
-    var outputStr = ""
-    if (str != "" && str.matches("\\d{1,2} \\p{L}+ \\d+".toRegex())) {
-        val vals = str.split(" ")
-        val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
-                "ноября", "декабря")
-        if (months.indexOf(vals[1]) != -1) {
-            val dayInMonth = daysInMonth(months.indexOf(vals[1]) + 1, vals[2].toInt())
-            if (vals[0].toInt() in 1..dayInMonth) {
-                outputStr = vals[0].padStart(2, '0') + "." +
-                        months.indexOf(vals[1]).plus(1).toString().padStart(2, '0') + "." + vals[2]
-            }
+    if (str == "" || !str.matches("\\d{1,2} \\p{L}+ \\d+".toRegex())) {
+        return ""
+    }
+    val vals = str.split(" ")
+    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
+            "ноября", "декабря")
+    if (months.indexOf(vals[1]) != -1) {
+        val dayInMonth = daysInMonth(months.indexOf(vals[1]) + 1, vals[2].toInt())
+        if (vals[0].toInt() in 1..dayInMonth) {
+            return vals[0].padStart(2, '0') + "." +
+                    months.indexOf(vals[1]).plus(1).toString().padStart(2, '0') + "." + vals[2]
         }
     }
-
-    return outputStr
+    return ""
 }
 
 
@@ -101,17 +100,16 @@ fun dateStrToDigit(str: String): String {
  * входными данными.
  */
 fun dateDigitToStr(digital: String): String {
-    var outputStr = ""
-    if (digital != "" && digital.matches("\\d{2}.\\d{2}.\\d{4,}".toRegex())) {
-        val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
-                "ноября", "декабря")
-        val vals = digital.split(".")
-        println(vals[1].toInt())
-        if (vals[1].toInt() - 1 in 0..11) {
-            outputStr = vals[0].toInt().toString() + " " + months[vals[1].toInt() - 1] + " " + vals[2]
-        }
+    if (digital == "" || !digital.matches("\\d{2}.\\d{2}.\\d+".toRegex())) {
+        return ""
     }
-    return outputStr
+    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
+            "ноября", "декабря")
+    val vals = digital.split(".")
+    if (vals[1].toInt() - 1 in 0..11 && vals[0].toInt() <= daysInMonth(vals[1].toInt(), vals[2].toInt())) {
+        return vals[0].toInt().toString() + " " + months[vals[1].toInt() - 1] + " " + vals[2]
+    }
+    return ""
 }
 
 /**
@@ -170,16 +168,11 @@ fun bestLongJump(jumps: String): Int {
  */
 fun bestHighJump(jumps: String): Int {
     var outputInt = -1
-    if (jumps.matches("^(\\d+ %{0,2}[-+%] ?)+".toRegex())) {
-        jumps.split(" %{0,2}[+] ?".toRegex()).forEach { it ->
-            val lastSp = it.indexOfLast { c -> c == ' ' }
-            val v = if (lastSp != -1) {
-                it.substring(lastSp + 1)
-            } else {
-                it
-            }
-            if (v.toIntOrNull() != null && v.toInt() > outputInt) {
-                outputInt = v.toInt()
+    val vals = jumps.split("\\s".toRegex())
+    if (vals.size > 1) {
+        for (i in 0 until vals.size step 2) {
+            if (vals[i + 1].endsWith("+") && vals[i].toInt() > outputInt) {
+                outputInt = vals[i].toInt()
             }
         }
     }
@@ -225,27 +218,16 @@ fun plusMinus(expression: String): Int {
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
-    var outputInt = -1
-    if (str.matches("^(.+ )*.+".toRegex())) {
-        var prev = Pair("", 0)
-        val words = str.split(" ")
-        for (word in words) {
-            if (word.toLowerCase() == prev.first) {
-                outputInt = prev.second - word.length - 1
-                break
-            } else {
-                val minusWhat = word.windowed(2) { it ->
-                    if (it == "\\\\") {
-                        1
-                    } else {
-                        0
-                    }
-                }.sum()
-                prev = Pair(word.toLowerCase(), prev.second + word.length + 1 - minusWhat)
-            }
+    var prev = Pair("", 0)
+    val words = str.split(" ")
+    for (word in words) {
+        if (word.toLowerCase() == prev.first) {
+            return prev.second - word.length - 1
+        } else {
+            prev = Pair(word.toLowerCase(), prev.second + word.length + 1)
         }
     }
-    return outputInt
+    return -1
 }
 
 /**
@@ -259,20 +241,20 @@ fun firstDuplicateIndex(str: String): Int {
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String {
-    var outputStr = ""
-    if (description.matches("^(.+ \\d+\\.\\d+; )*.+ \\d+\\.\\d+".toRegex())) {
-        var best = Pair("", 0.0)
-        description.split("; ").forEach { item ->
-            val vals = item.split(" ")
-            if (vals[1].toDouble() > best.second) {
-                best = Pair(vals[0], vals[1].toDouble())
+fun mostExpensive(description: String): String =
+        if (description.matches("^(.+ \\d+\\.\\d+; )*.+ \\d+\\.\\d+".toRegex())) {
+            var best = Pair("", 0.0)
+            description.split("; ").forEach { item ->
+                val vals = item.split(" ")
+                if (vals[1].toDouble() > best.second) {
+                    best = Pair(vals[0], vals[1].toDouble())
+                }
             }
+            best.first
+        } else {
+            ""
         }
-        outputStr = best.first
-    }
-    return outputStr
-}
+
 
 /**
  * Сложная

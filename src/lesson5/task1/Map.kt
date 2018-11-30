@@ -98,13 +98,11 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val outputMap: MutableMap<String, String> = mapA.toMutableMap()
-    mapB.forEach({ t, u ->
-        if (outputMap.containsKey(t) && mapA[t] != u) {
+    mapB.forEach { t, u ->
+        if (outputMap.getOrPut(t) { u } != u && mapA[t] != u) {
             outputMap[t] = outputMap[t] + ", " + u
-        } else {
-            outputMap[t] = u
         }
-    })
+    }
 
     return outputMap
 }
@@ -122,10 +120,8 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val outputMap: MutableMap<Int, MutableList<String>> = mutableMapOf()
     grades.forEach { t, u ->
-        if (outputMap.containsKey(u) && !outputMap[u]!!.contains(t)) {
+        if (!outputMap.getOrPut(u) { mutableListOf(t) }.contains(t)) {
             outputMap[u]!!.add(t)
-        } else {
-            outputMap[u] = mutableListOf(t)
         }
     }
 
@@ -143,13 +139,8 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    for ((key, value) in a) {
-        if (b[key] != value)
-            return false
-    }
-    return true
-}
+fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean =
+        a.all { entry -> b[entry.key] == entry.value }
 
 /**
  * Средняя
@@ -166,7 +157,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
     var counter = 0
     var amount = 0.0
     val outputMap: MutableMap<String, Double> = mutableMapOf()
-    for ((key, value) in stockPrices.toList().sortedBy { pair -> pair.first }) {
+    for ((key, value) in stockPrices.toList().sortedBy { (first) -> first }) {
         if (code != key) {
             if (code != null)
                 outputMap[code] = amount / counter
@@ -199,17 +190,8 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *     "печенье"
  *   ) -> "Мария"
  */
-fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var output: String? = null
-    var cBest = Double.MAX_VALUE
-    stuff.forEach { t, u ->
-        if (u.first == kind && u.second < cBest) {
-            output = t
-            cBest = u.second
-        }
-    }
-    return output
-}
+fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? =
+        stuff.filter { it -> it.value.first == kind }.minBy { it -> it.value.second }?.key
 
 /**
  * Сложная
@@ -243,7 +225,7 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
         val queue: Queue<String> = ArrayDeque<String>(values)
         while (queue.isNotEmpty()) {
             val c = queue.poll()
-            outputMap.putIfAbsent(c, emptySet<String>().toMutableSet())
+            outputMap.putIfAbsent(c, mutableSetOf())
             if (friends[c] != null) {
                 friends[c]!!.forEach { it ->
                     if (!outputMap[key]!!.contains(it) && key != it) {
@@ -280,11 +262,8 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit =
  *
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    val output: MutableList<String> = a.toSet().toMutableList()
-    output.addAll(b.toSet())
-    return output.groupingBy { it }.eachCount().filter { it.value > 1 }.keys.toList()
-}
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
+        a.intersect(b).toList()
 
 /**
  * Средняя
@@ -295,24 +274,8 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    var result = true
-    val lChars: MutableSet<Char> = mutableSetOf()
-    chars.forEach { c ->
-        if (c.isLetter()) {
-            lChars.add(c.toLowerCase())
-        } else {
-            lChars.add(c)
-        }
-    }
-    for (c in word) {
-        if (!chars.contains(c) && !chars.contains(c.toLowerCase())) {
-            result = false
-            break
-        }
-    }
-    return result
-}
+fun canBuildFrom(chars: List<Char>, word: String): Boolean =
+        chars.containsAll(word.toSet())
 
 /**
  * Средняя
@@ -339,18 +302,16 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    var result = false
     val db: MutableSet<String> = mutableSetOf()
     for (word in words) {
         val curChars = word.groupingBy { it }.eachCount().keys.sorted().toString()
         if (db.contains(curChars)) {
-            result = true
-            break
+            return true
         } else {
             db.add(curChars)
         }
     }
-    return result
+    return false
 }
 
 /**
@@ -372,7 +333,7 @@ fun hasAnagrams(words: List<String>): Boolean {
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     var result = Pair(-1, -1)
-    var halfList = mutableListOf<Int>()
+    val halfList = mutableListOf<Int>()
     val tmpMap = mutableMapOf<Int, Int>()
     for ((index, value) in list.withIndex()) {
         if (value <= number) {
@@ -387,12 +348,11 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         val i = tmpMap[number - key]
         if (i != null) {
             if (i != value) {
-                result = if (i < value) {
+                return if (i < value) {
                     Pair(i, value)
                 } else {
                     Pair(value, i)
                 }
-                break
             } else {
                 if (halfList.size >= 2) {
                     result = Pair(halfList[0], halfList[1])

@@ -64,7 +64,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
                 counter++
             }
         }
-        outputMap.put(substr, counter)
+        outputMap[substr] = counter
     }
 
     return outputMap
@@ -309,7 +309,23 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val lines = File(inputName).readLines()
+    var maxl = 0
+    val chaoticWords = mutableListOf<String>()
+    lines.forEach { line ->
+        if (line.toLowerCase().toHashSet().size == line.length && line.length >= maxl) {
+            maxl = line.length
+            chaoticWords.add(line)
+        }
+    }
+
+    val wordsList = mutableListOf<String>()
+    for (line in chaoticWords) {
+        if (line.length == maxl) {
+            wordsList.add(line)
+        }
+    }
+    File(outputName).writeText(wordsList.joinToString(", "))
 }
 
 /**
