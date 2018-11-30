@@ -56,14 +56,22 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
  */
 class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : Matrix<E> {
 
-    val map = mutableMapOf<Cell, E>()
+    val data = mutableMapOf<Cell, E>()
+
+    init {
+        for (i in 0 until height) {
+            for (j in 0 until width) {
+                data[Cell(i, j)] = e
+            }
+        }
+    }
 
     override fun get(row: Int, column: Int): E =
             get(Cell(row, column))
 
     override fun get(cell: Cell): E {
-        if (map.containsKey(cell)) {
-            return map.getValue(cell)
+        if (data.containsKey(cell)) {
+            return data.getValue(cell)
         } else {
             throw IllegalArgumentException()
         }
@@ -73,31 +81,21 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
             set(Cell(row, column), value)
 
     override fun set(cell: Cell, value: E) {
-        map[cell] = value
+        data[cell] = value
     }
 
     override fun equals(other: Any?): Boolean =
-            other is MatrixImpl<*> && height == other.height && width == other.width && map == other.map
+            other is MatrixImpl<*> && height == other.height && width == other.width && data == other.data
 
     override fun hashCode(): Int {
         var result = height
         result = 31 * result + width
-        result = 31 * result + map.hashCode()
+        result = 31 * result + data.hashCode()
         return result
     }
 
-    override fun toString(): String {
-        val sb = StringBuilder()
-        sb.append("[\n")
-        for (row in 0 until height) {
-            sb.append("[")
-            for (column in 0 until width) {
-                sb.append(this[row, column])
-            }
-            sb.append("]\n")
-        }
-        sb.append("]")
-        return sb.toString()
-    }
+    override fun toString(): String =
+            "{\n  \"data\": " + data.map { entry -> entry.value }.joinToString(prefix = "[\n    ",
+                    separator = ",\n    ", postfix = "\n  ],\n") + "  \"height\": " + height + ",\n  \"width\": " + width + "\n}"
 }
 
