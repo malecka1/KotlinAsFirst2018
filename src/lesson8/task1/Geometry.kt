@@ -3,10 +3,7 @@
 package lesson8.task1
 
 import lesson1.task1.sqr
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * Точка на плоскости
@@ -79,7 +76,7 @@ data class Circle(val center: Point, val radius: Double) {
      * Расстояние между пересекающимися окружностями считать равным 0.0.
      */
     fun distance(other: Circle): Double {
-        return if (contains(other.center)) {
+        return if (contains(other.center) || other.contains(center)) {
             0.0
         } else {
             center.distance(other.center) - (radius + other.radius)
@@ -182,7 +179,7 @@ class Line private constructor(val b: Double, val angle: Double) {
  */
 fun lineBySegment(s: Segment): Line {
     val slope = (s.end.y - s.begin.y) / (s.end.x - s.begin.x)
-    return Line(s.begin, Math.atan(slope))
+    return Line(s.begin, Math.atan(slope).absoluteValue)
 }
 
 /**
@@ -198,20 +195,12 @@ fun lineByPoints(a: Point, b: Point): Line =
  *
  * Построить серединный перпендикуляр по отрезку или по двум точкам
  */
-fun bisectorByPoints(a: Point, b: Point): Line { // a je x1,y1?
-    val d = a.distance(b) // d
+fun bisectorByPoints(a: Point, b: Point): Line {
     val xp = a.x + (b.x - a.x) / 2 // midpoint
     val yp = a.y + (b.y - a.y) / 2
-    val slope = (b.y - a.y) / (b.x - a.x) // line slope // m
+    val slope = (b.y - a.y) / (b.x - a.x) // line slope
     val perpen = -1.0 / slope
-
-    // y - yp = perpen * (x - xp)
-
-    val xx = Math.sqrt(d * d / (1 + slope * slope)) + xp
-    val yy = Math.sqrt(d * d / (1 + slope * slope)) * slope + yp
-
-    println(Point(xx, yy).toString() + " | " + Math.atan(slope))
-    return Line(Point(xx, yy), Math.atan(slope))
+    return Line(Point(xp, yp), Math.atan(perpen).absoluteValue)
 }
 
 /**
@@ -220,7 +209,25 @@ fun bisectorByPoints(a: Point, b: Point): Line { // a je x1,y1?
  * Задан список из n окружностей на плоскости. Найти пару наименее удалённых из них.
  * Если в списке менее двух окружностей, бросить IllegalArgumentException
  */
-fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> = TODO()
+fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
+    if (circles.size < 2) {
+        throw IllegalArgumentException()
+    }
+
+    var min = Double.MAX_VALUE
+    var output = Pair(circles[0], circles[2])
+    circles.forEachIndexed { index, circle ->
+        for (j in index + 1 until circles.size) {
+            val tmp = circle.distance(circles[j]).absoluteValue
+            if (tmp < min) {
+                min = tmp
+                output = Pair(circle, circles[j])
+            }
+        }
+    }
+
+    return output
+}
 
 /**
  * Сложная
