@@ -76,10 +76,11 @@ data class Circle(val center: Point, val radius: Double) {
      * Расстояние между пересекающимися окружностями считать равным 0.0.
      */
     fun distance(other: Circle): Double {
-        return if (contains(other.center) || other.contains(center)) {
+        val d = center.distance(other.center) - (radius + other.radius)
+        return if (d < 0.0) {
             0.0
         } else {
-            center.distance(other.center) - (radius + other.radius)
+            d
         }
     }
 
@@ -177,10 +178,7 @@ class Line private constructor(val b: Double, val angle: Double) {
  *
  * Построить прямую по отрезку
  */
-fun lineBySegment(s: Segment): Line {
-    val slope = (s.end.y - s.begin.y) / (s.end.x - s.begin.x)
-    return Line(s.begin, Math.atan(slope).absoluteValue)
-}
+fun lineBySegment(s: Segment): Line = Line(s.begin, Math.atan2(s.end.y - s.begin.y, s.end.x - s.begin.x).absoluteValue)
 
 /**
  * Средняя
@@ -196,11 +194,10 @@ fun lineByPoints(a: Point, b: Point): Line =
  * Построить серединный перпендикуляр по отрезку или по двум точкам
  */
 fun bisectorByPoints(a: Point, b: Point): Line {
-    val xp = a.x + (b.x - a.x) / 2 // midpoint
-    val yp = a.y + (b.y - a.y) / 2
+    val midPoint = Point((a.x + b.x) / 2.0, (a.y + b.y) / 2.0)
     val slope = (b.y - a.y) / (b.x - a.x) // line slope
-    val perpen = -1.0 / slope
-    return Line(Point(xp, yp), Math.atan(perpen).absoluteValue)
+    val m = -1.0 / slope
+    return Line(midPoint, Math.atan(m).absoluteValue)
 }
 
 /**
@@ -215,7 +212,7 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
     }
 
     var min = Double.MAX_VALUE
-    var output = Pair(circles[0], circles[2])
+    var output = Pair(circles[0], circles[1])
     circles.forEachIndexed { index, circle ->
         for (j in index + 1 until circles.size) {
             val tmp = circle.distance(circles[j]).absoluteValue

@@ -204,12 +204,11 @@ fun alignFileByWidth(inputName: String, outputName: String) {
                     sb.append(wordsIt.next()).append(" ".repeat(nrC + 1))
                     nrL--
                 }
+                var sbTmp = StringBuilder()
                 wordsIt.forEachRemaining { w ->
-                    sb.append(w)
-                    if (w != words.last()) {
-                        sb.append(" ".repeat(nrC))
-                    }
+                    sbTmp.append(w + " ".repeat(nrC))
                 }
+                sb.append(sbTmp.toString().trimEnd())
             }
         }
         sb.append("\n")
@@ -281,7 +280,22 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    val sb = StringBuilder()
+    File(inputName).readText().forEach { c ->
+        val vLow = dictionary[c.toLowerCase()]
+        val vUpp = dictionary[c.toUpperCase()]
+        if (vLow == null && vUpp == null) {
+            sb.append(c)
+        } else {
+            val value = vLow ?: vUpp!!
+            if (c.isUpperCase()) {
+                sb.append(value[0].toUpperCase() + value.substring(1).toLowerCase())
+            } else {
+                sb.append(value.toLowerCase())
+            }
+        }
+    }
+    File(outputName).writeText(sb.toString())
 }
 
 /**
@@ -372,7 +386,32 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val usedMarks = mutableSetOf<String>()
+    val mapping = mapOf("**" to Pair("<b>", "</b>"), "*" to Pair("<i>", "</i>"), "~~" to Pair("<s>", "</s>"))
+    val sb = StringBuilder("<html><body><p>")
+    File(inputName).readLines().forEach { line ->
+        if (line.isEmpty()) {
+            sb.append("</p><p>")
+        } else {
+            var tmp = line
+            for ((key, value) in mapping) {
+                while (tmp.contains(key)) {
+                    var mark = ""
+                    if (usedMarks.contains(key)) {
+                        mark = value.second
+                        usedMarks.remove(key)
+                    } else {
+                        mark = value.first
+                        usedMarks.add(key)
+                    }
+                    tmp = tmp.replaceFirst(key, mark)
+                }
+            }
+            sb.append(tmp)
+        }
+    }
+
+    File(outputName).writeText(sb.append("</p></body></html>").toString())
 }
 
 /**

@@ -2,6 +2,8 @@
 
 package lesson8.task2
 
+import kotlin.math.absoluteValue
+
 /**
  * Клетка шахматной доски. Шахматная доска квадратная и имеет 8 х 8 клеток.
  * Поэтому, обе координаты клетки (горизонталь row, вертикаль column) могут находиться в пределах от 1 до 8.
@@ -39,7 +41,7 @@ data class Square(val column: Int, val row: Int) {
  * Если нотация некорректна, бросить IllegalArgumentException
  */
 fun square(notation: String): Square {
-    if (notation.length == 2) {
+    if (notation.length == 2 && notation[0].toString().matches("[a-h]".toRegex()) && notation[1].isDigit()) {
         val s = Square(notation[0].toInt() - 96, notation[1].toString().toInt())
         if (s.inside()) {
             return s
@@ -138,7 +140,7 @@ fun rookTrajectory(start: Square, end: Square): List<Square> {
 fun bishopMoveNumber(start: Square, end: Square): Int {
     if (start.inside() && end.inside()) {
         return when {
-            (start.column - start.row) % 2 != (end.column - end.row) % 2 -> -1
+            (start.column - start.row).absoluteValue % 2 != (end.column - end.row).absoluteValue % 2 -> -1
             start == end -> 0
             (start.column - end.column) == (start.row - end.row) -> 1
             else -> 2
