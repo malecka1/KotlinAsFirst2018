@@ -288,10 +288,12 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
             sb.append(c)
         } else {
             val value = vLow ?: vUpp!!
-            if (c.isUpperCase()) {
-                sb.append(value[0].toUpperCase() + value.substring(1).toLowerCase())
-            } else {
-                sb.append(value.toLowerCase())
+            if (value != "") {
+                if (c.isUpperCase()) {
+                    sb.append(value[0].toUpperCase() + value.substring(1).toLowerCase())
+                } else {
+                    sb.append(value.toLowerCase())
+                }
             }
         }
     }
@@ -386,32 +388,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    val usedMarks = mutableSetOf<String>()
-    val mapping = mapOf("**" to Pair("<b>", "</b>"), "*" to Pair("<i>", "</i>"), "~~" to Pair("<s>", "</s>"))
-    val sb = StringBuilder("<html><body><p>")
-    File(inputName).readLines().forEach { line ->
-        if (line.isEmpty()) {
-            sb.append("</p><p>")
-        } else {
-            var tmp = line
-            for ((key, value) in mapping) {
-                while (tmp.contains(key)) {
-                    var mark = ""
-                    if (usedMarks.contains(key)) {
-                        mark = value.second
-                        usedMarks.remove(key)
-                    } else {
-                        mark = value.first
-                        usedMarks.add(key)
-                    }
-                    tmp = tmp.replaceFirst(key, mark)
-                }
-            }
-            sb.append(tmp)
-        }
-    }
-
-    File(outputName).writeText(sb.append("</p></body></html>").toString())
+    TODO() // udelat pres zasobnik, kterej se vzdycky otoci, kdyz se tagy prekryvaji, nej asi jet po znaku a checkovat s next indexem pro vice znakove tagy
 }
 
 /**
