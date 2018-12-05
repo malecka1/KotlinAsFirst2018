@@ -98,8 +98,9 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val outputMap: MutableMap<String, String> = mapA.toMutableMap()
-    mapB.forEach { t, u ->
-        if (outputMap.getOrPut(t) { u } != u && mapA[t] != u) {
+    mapB.forEach { (t, u) ->
+        val v = outputMap.getOrPut(t) { u }
+        if (v != u && mapA[t] != u) {
             outputMap[t] = outputMap[t] + ", " + u
         }
     }
@@ -119,8 +120,9 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val outputMap: MutableMap<Int, MutableList<String>> = mutableMapOf()
-    grades.forEach { t, u ->
-        if (!outputMap.getOrPut(u) { mutableListOf(t) }.contains(t)) {
+    grades.forEach { (t, u) ->
+        val v = outputMap.getOrPut(u) { mutableListOf(t) }
+        if (!v.contains(t)) {
             outputMap[u]!!.add(t)
         }
     }
@@ -140,7 +142,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean =
-        a.all { entry -> b[entry.key] == entry.value }
+        a.all { (key, value) -> b[key] == value } // destructed pair instead of param "pair"
 
 /**
  * Средняя
@@ -191,7 +193,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? =
-        stuff.filter { it -> it.value.first == kind }.minBy { it -> it.value.second }?.key
+        stuff.filter { (_, value) -> value.first == kind }.minBy { (_, value) -> value.second }?.key
 
 /**
  * Сложная
@@ -332,7 +334,6 @@ fun hasAnagrams(words: List<String>): Boolean {
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    var result = Pair(-1, -1)
     val halfList = mutableListOf<Int>()
     val tmpMap = mutableMapOf<Int, Int>()
     for ((index, value) in list.withIndex()) {
@@ -344,7 +345,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         }
     }
 
-    for ((key, value) in tmpMap) {
+    tmpMap.forEach { (key, value) ->
         val i = tmpMap[number - key]
         if (i != null) {
             if (i != value) {
@@ -355,14 +356,13 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
                 }
             } else {
                 if (halfList.size >= 2) {
-                    result = Pair(halfList[0], halfList[1])
-                    break
+                    return Pair(halfList[0], halfList[1])
                 }
             }
         }
     }
 
-    return result
+    return Pair(-1, -1)
 }
 
 /**

@@ -142,7 +142,7 @@ fun bishopMoveNumber(start: Square, end: Square): Int {
         return when {
             (start.column - start.row).absoluteValue % 2 != (end.column - end.row).absoluteValue % 2 -> -1
             start == end -> 0
-            (start.column - end.column) == (start.row - end.row) -> 1
+            (start.column - end.column).absoluteValue == (start.row - end.row).absoluteValue -> 1
             else -> 2
         }
     }

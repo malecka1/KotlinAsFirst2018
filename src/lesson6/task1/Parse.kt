@@ -76,8 +76,7 @@ fun dateStrToDigit(str: String): String {
         return ""
     }
     val vals = str.split(" ")
-    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
-            "ноября", "декабря")
+    val months = getMonthsList()
     if (months.indexOf(vals[1]) != -1) {
         val dayInMonth = daysInMonth(months.indexOf(vals[1]) + 1, vals[2].toInt())
         if (vals[0].toInt() in 1..dayInMonth) {
@@ -88,6 +87,9 @@ fun dateStrToDigit(str: String): String {
     return ""
 }
 
+private fun getMonthsList(): List<String> =
+        listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
+                "ноября", "декабря")
 
 /**
  * Средняя
@@ -103,8 +105,7 @@ fun dateDigitToStr(digital: String): String {
     if (digital == "" || !digital.matches("\\d{2}.\\d{2}.\\d+".toRegex())) {
         return ""
     }
-    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
-            "ноября", "декабря")
+    val months = getMonthsList()
     val vals = digital.split(".")
     if (vals[1].toInt() - 1 in 0..11 && vals[0].toInt() <= daysInMonth(vals[1].toInt(), vals[2].toInt())) {
         return vals[0].toInt().toString() + " " + months[vals[1].toInt() - 1] + " " + vals[2]
@@ -146,9 +147,10 @@ fun flattenPhoneNumber(phone: String): String {
 fun bestLongJump(jumps: String): Int {
     var outputInt = -1
     val re = Regex("[^\\d %\\-]")
-    if (!jumps.contains(re)) {
+    val reg2 = Regex("[^\\d]")
+    if (jumps.isNotEmpty() && !jumps.contains(re)) {
         jumps.split(" ").forEach { value ->
-            if (value != "" && !value.contains("[^\\d]".toRegex()) && value.toInt() > outputInt) {
+            if (!value.contains(reg2) && value.toInt() > outputInt) {
                 outputInt = value.toInt()
             }
         }
