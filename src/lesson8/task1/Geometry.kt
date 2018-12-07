@@ -178,7 +178,13 @@ class Line private constructor(val b: Double, val angle: Double) {
  *
  * Построить прямую по отрезку
  */
-fun lineBySegment(s: Segment): Line = Line(s.begin, Math.atan2(s.end.y - s.begin.y, s.end.x - s.begin.x) * 180 / PI)
+fun lineBySegment(s: Segment): Line {
+    var angle = Math.atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
+    if (angle < 0) {
+        angle += PI
+    }
+    return Line(s.begin, angle)
+}
 
 /**
  * Средняя
@@ -194,10 +200,12 @@ fun lineByPoints(a: Point, b: Point): Line =
  * Построить серединный перпендикуляр по отрезку или по двум точкам
  */
 fun bisectorByPoints(a: Point, b: Point): Line {
+    var angle = Math.atan(-1 / ((b.y - a.y) / (b.x - a.x)))
+    if (angle < 0) {
+        angle += PI
+    }
     val midPoint = Point((a.x + b.x) / 2.0, (a.y + b.y) / 2.0)
-    val slope = (b.y - a.y) / (b.x - a.x) // line slope
-    val m = -1.0 / slope
-    return Line(midPoint, Math.atan(m).absoluteValue)
+    return Line(midPoint, angle)
 }
 
 /**
